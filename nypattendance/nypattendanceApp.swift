@@ -20,7 +20,7 @@ struct nypattendanceApp: App {
 
 extension UTType {
     static var itemDocument: UTType {
-        UTType(importedAs: "com.example.item-document")
+        UTType(importedAs: "com.decked.attendance")
     }
 }
 
@@ -38,6 +38,6 @@ struct nypattendanceVersionedSchema: VersionedSchema {
     static var versionIdentifier = Schema.Version(1, 0, 0)
 
     static var models: [any PersistentModel.Type] = [
-        Item.self,
+        Class.self,
     ]
 }
