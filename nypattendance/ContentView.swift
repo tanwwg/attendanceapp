@@ -76,7 +76,7 @@ extension String {
 
 struct AttendanceView: View {
     @Bindable var att: Attendance
-//    @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var modelContext
     
 //    @State var isInputStudents = false
     
@@ -93,6 +93,7 @@ struct AttendanceView: View {
                     Toggle("", isOn: Binding(get: { a.isAttend }, set: { v in
                         if let idx = att.attendees.firstIndex(where: { $0.id == a.id }) {
                             att.attendees[idx].isAttend = v
+                            try? modelContext.save()
                         }
                     }))
                 }
@@ -109,12 +110,22 @@ struct AttendanceView: View {
                     TextField("Remarks", text: Binding(get: { a.remarks }, set: { v in
                         if let idx = att.attendees.firstIndex(where: { $0.id == a.id }) {
                             att.attendees[idx].remarks = v
+                            try? modelContext.save()
                         }
                     }))
                 }
             }
+            .onChange(of: sel) { onSelChanged() }
         }
         .padding()
+    }
+    
+    func onSelChanged() {
+        guard let selid = sel else { return }
+        guard let idx = att.attendees.firstIndex(where: { $0.id == selid }) else { return }
+        att.attendees[idx].isAttend.toggle()
+        sel = nil
+        try? modelContext.save()
     }
 }
 

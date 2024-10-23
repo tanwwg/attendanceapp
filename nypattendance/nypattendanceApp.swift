@@ -38,6 +38,6 @@ struct nypattendanceVersionedSchema: VersionedSchema {
     static var versionIdentifier = Schema.Version(1, 0, 0)
 
     static var models: [any PersistentModel.Type] = [
-        Class.self,
+        Class.self, Attendance.self
     ]
 }
