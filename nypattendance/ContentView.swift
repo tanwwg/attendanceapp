@@ -96,6 +96,7 @@ struct AttendanceView: View {
                             try? modelContext.save()
                         }
                     }))
+                    .padding(.vertical)
                 }
                 .width(60.0)
                 
@@ -129,6 +130,14 @@ struct AttendanceView: View {
     }
 }
 
+extension Date {
+    func formattedDayMonthWeekday() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE, d MMMM"
+        return dateFormatter.string(from: self)
+    }
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var classes: [Class]
@@ -144,13 +153,13 @@ struct ContentView: View {
                         ForEach(classes) { cl in
                             Text("\(cl.name)")
                         }
-                        //                    .onDelete(perform: deleteItems)
+                        .onDelete(perform: deleteClass)
                     }
                 }
                 if let cl = selectedClass {
                     Section("Attendance") {
-                        List(cl.attendance, selection: $selectedAttId) { att in
-                            Text("\(att.timestamp)")
+                        List(cl.attendance.sorted(by: { $1.timestamp < $0.timestamp }), selection: $selectedAttId) { att in
+                            Text("\(att.timestamp.formattedDayMonthWeekday())")
                         }
                     }
                 }
@@ -199,11 +208,14 @@ struct ContentView: View {
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
+    private func deleteClass(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(classes[index])
+                if !classes[index].attendance.isEmpty {
+                    modelContext.delete(classes[index])
+                }
             }
+            try? modelContext.save()
         }
     }
 }
